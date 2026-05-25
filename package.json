@@ -1,0 +1,17 @@
+{
+  "name": "vitrine-de-jogos-indies",
+  "version": "1.0.0",
+  "description": "Trabalho de extensão e programação web",
+  "license": "ISC",
+  "author": "Ayslan Araujo, Caio Macedo, Raiane Oliveira, Fernando Osório, Giovanna",
+  "type": "commonjs",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^5.2.1",
+    "mysql": "^2.18.1"
+  }
+}

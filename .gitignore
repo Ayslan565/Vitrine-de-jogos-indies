@@ -1,0 +1,31 @@
+# Dependências do Node (Esta é a linha que bloqueia a pasta)
+node_modules/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Arquivos de ambiente (Nunca envie suas senhas e chaves de API para o GitHub)
+.env
+.env.test
+.env.production
+.env.local
+
+# Diretórios de build/saída
+dist/
+build/
+out/
+
+# Arquivos de cache e temporários
+.npm
+.eslintcache
+.stylelintcache
+.tsbuildinfo
+
+# Arquivos de sistema operacional
+.DS_Store
+Thumbs.db

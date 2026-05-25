@@ -1,0 +1,7 @@
+ npm init                 
+ npm install mysql     
+ npm install express   
+ npm install -g nodemon 
+
+Comando para executar a aplicação:
+npx nodemon server.js
