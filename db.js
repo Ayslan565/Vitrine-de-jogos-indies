@@ -2,7 +2,7 @@ const mysql = require('mysql');
 
 const connection = mysql.createConnection({
     host: 'localhost',
-    user: '',//Insira seu usuário do MySQL aqui
+    user: 'root',//Insira seu usuário do MySQL aqui
     password: '', //Insira sua senha do MySQL aqui
     database: 'dbgames', //Altere para o nome do seu banco de dados
     port: '3306'//Altere para a sua porta Mysql, se necessário

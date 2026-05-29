@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - IndieHub</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .form-container {
+            background-color: var(--surface-color);
+            padding: 2rem;
+            border-radius: 8px;
+            max-width: 400px;
+            margin: 2rem auto;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+        .form-container input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            background: #2d2d2d;
+            border: 1px solid #444;
+            color: white;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        #mensagemErro { 
+            color: #ff6b6b; 
+            margin-top: 15px; 
+            font-weight: bold; 
+            text-align: center; 
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">IndieHub</div>
+        <nav><a href="/">⬅ Voltar à Vitrine</a></nav>
+    </header>
+
+    <main class="container">
+        <h2 class="section-title" style="text-align: center;">Acesso Desenvolvedor</h2>
+        
+        <div class="form-container">
+            <form id="form-login">
+                <label for="email">E-mail:</label>
+                <input type="email" id="email" required placeholder="ex: dev@indiehub.com">
+                
+                <label for="senha">Senha:</label>
+                <input type="password" id="senha" required placeholder="••••••••">
+                
+                <button type="submit" class="btn-upload" style="width: 100%;">Entrar</button>
+            </form>
+            
+            <p id="mensagemErro"></p>
+
+            <div style="text-align: center; margin-top: 20px; border-top: 1px solid #444; padding-top: 15px;">
+                <p>Ainda não tem conta?</p>
+                <a href="/cadastro.html" style="color: #8b5cf6; text-decoration: none; font-weight: bold;">Criar conta agora</a>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.getElementById('form-login').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const senha = document.getElementById('senha').value;
+            const mensagem = document.getElementById('mensagemErro');
+
+            mensagem.innerText = "A validar...";
+            mensagem.style.color = "yellow";
+
+            try {
+                const resposta = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: email, senha: senha })
+                });
+
+                const dados = await resposta.json();
+
+                if (resposta.ok) {
+                    mensagem.style.color = "#4ade80"; // Verde
+                    mensagem.innerText = "Login efetuado! Redirecionando...";
+                    // Após o login, leva para a página de upload
+                    setTimeout(() => window.location.href = '/upload.html', 1000);
+                } else {
+                    mensagem.style.color = "#ff6b6b"; // Vermelho
+                    mensagem.innerText = dados.erro;
+                }
+            } catch (erro) {
+                mensagem.style.color = "#ff6b6b";
+                mensagem.innerText = "Erro ao conectar ao servidor.";
+            }
+        });
+    </script>
+</body>
+</html>

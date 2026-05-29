@@ -14,8 +14,8 @@
             <a href="#">Início</a>
             <a href="#">Explorar</a>
             <a href="#">Comunidade</a>
-            <button class="btn-upload" onclick="alert('Isso abriria o modal para o desenvolvedor fazer upload do jogo via Multer no Node!')">Subir Jogo</button>
-        </nav>
+            <button class="btn-upload" onclick="window.location.href='/login.html'">Subir Jogo</button>     
+           </nav>
     </header>
 
     <section class="hero">
@@ -26,89 +26,14 @@
     <main class="container">
         <h2 class="section-title">Lançamentos Recentes</h2>
         
-        <div class="game-grid">
-            <!-- Jogo 1 -->
-            <div class="game-card" onclick="alert('Redirecionando para a página do jogo...')">
-                <div class="game-cover ponto-sem-volta">
-                    [Arte da Capa do Jogo]
-                </div>
-                <div class="game-info">
-                    <div class="game-title">Ponto Sem Volta</div>
-                    <div class="game-dev">por Ayslan Araújo & Caio Macedo</div>
-                    <div class="tags">
-                        <span class="tag">Simulador Político</span>
-                        <span class="tag">Noir</span>
-                        <span class="tag">Terror Analógico</span>
-                    </div>
-                    <div class="game-footer">
-                        <span class="price">Gratuito</span>
-                        <span>⭐ 4.9 (12 avaliações)</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Jogo 2 -->
-            <div class="game-card">
-                <div class="game-cover" style="background: linear-gradient(45deg, #1d4ed8, #1e40af);">
-                    [Arte da Capa do Jogo]
-                </div>
-                <div class="game-info">
-                    <div class="game-title">Neon Knight: Origins</div>
-                    <div class="game-dev">por PixelForge Studios</div>
-                    <div class="tags">
-                        <span class="tag">Ação 2D</span>
-                        <span class="tag">Cyberpunk</span>
-                    </div>
-                    <div class="game-footer">
-                        <span class="price paid">R$ 5,00</span>
-                        <span>⭐ 4.5 (8 avaliações)</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Jogo 3 -->
-            <div class="game-card">
-                <div class="game-cover" style="background: linear-gradient(45deg, #166534, #14532d);">
-                    [Arte da Capa do Jogo]
-                </div>
-                <div class="game-info">
-                    <div class="game-title">Jornada na Floresta</div>
-                    <div class="game-dev">por Raiane Oliveira</div>
-                    <div class="tags">
-                        <span class="tag">Aventura</span>
-                        <span class="tag">Casual</span>
-                    </div>
-                    <div class="game-footer">
-                        <span class="price">Pague o que Quiser</span>
-                        <span>⭐ 5.0 (3 avaliações)</span>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Jogo 4 -->
-            <div class="game-card">
-                <div class="game-cover" style="background: linear-gradient(45deg, #7f1d1d, #991b1b);">
-                    [Arte da Capa do Jogo]
-                </div>
-                <div class="game-info">
-                    <div class="game-title">Fuga do Labirinto</div>
-                    <div class="game-dev">por Fernando Ozório</div>
-                    <div class="tags">
-                        <span class="tag">Puzzle</span>
-                        <span class="tag">Mobile</span>
-                    </div>
-                    <div class="game-footer">
-                        <span class="price">Gratuito</span>
-                        <span>⭐ 4.2 (25 avaliações)</span>
-                    </div>
-                </div>
-            </div>
+        <div class="game-grid" id="lista-jogos">
+            <p>A carregar jogos da base de dados...</p>
         </div>
     </main>
 
     <footer>
         <p>&copy; 2026 IndieHub. Construído para a comunidade independente.</p>
-    </footer>
+    </footer><script src="script.js"></script>
 
-</body>
+    </body>
 </html>

@@ -13,7 +13,6 @@ const db = require('./db');
 const apiRouter = require('./routes/api');
 
 //Atualizar essa parte conforme vamos desenvolvendo as rotas da API
-app.use('/routes/api', apiRouter);
 app.use(express.json());
 app.use('/api', apiRouter);
 
