@@ -2,13 +2,13 @@ const mysql = require('mysql');
 
 const connection = mysql.createConnection({
     host: 'localhost',
-    user: 'root',//Insira seu usuário do MySQL aqui
+    user: '',//Insira seu usuário do MySQL aqui
     password: '', //Insira sua senha do MySQL aqui
-    database: 'indiehub', 
+    database: 'dbgames', //Altere para o nome do seu banco de dados
     port: '3306'//Altere para a sua porta Mysql, se necessário
 });
 
-db.connect((err) => {
+connection.connect((err) => {
     if (err) {
         console.error('Erro ao conectar ao banco de dados:', err);
         return;
@@ -16,4 +16,4 @@ db.connect((err) => {
     console.log('Conectado ao banco de dados MySQL!');
 });
 
-module.exports = db;
+module.exports = connection;
