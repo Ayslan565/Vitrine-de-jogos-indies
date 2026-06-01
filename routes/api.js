@@ -1,9 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../db');
-
 const multer = require('multer');
+const bcrypt = require('bcrypt');
 
+// ==========================================
+// CONFIGURAÇÃO DO MULTER
+// O que faz: Prepara o sistema para receber imagens e guardá-las na pasta public/uploads/
+// ==========================================
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
       cb(null, 'public/uploads/');
@@ -11,24 +15,25 @@ const storage = multer.diskStorage({
     filename: function (req, file, cb) {
       cb(null, file.originalname);
     }
-  });
-const bcrypt = require('bcrypt')
+});
 const upload = multer({ storage: storage });
 
-
+// ==========================================
+// ROTA: CADASTRO
+// O que faz: Recebe os dados do formulário, criptografa a senha e salva um novo desenvolvedor no banco de dados.
+// ==========================================
 router.post('/cadastro', async (req, res) => {
-    const { username, email, senha, bio } = req.body;
+    const { username, email, password, bio } = req.body;
     const role = 'developer';
 
     try {
-        const senhaCriptografada = await bcrypt.hash(senha, 10);
-
+        const senhaCriptografada = await bcrypt.hash(password, 10);
         const query = 'INSERT INTO users (username, email, password_hash, role, bio) VALUES (?, ?, ?, ?, ?)';
         
         db.query(query, [username, email, senhaCriptografada, role, bio], (err, results) => {
             if (err) {
                 console.error('Erro ao criar conta:', err);
-                return res.status(500).json({ erro: 'Erro ao criar conta. E-mail ou Utilizador em uso.' });
+                return res.status(500).json({ erro: 'Erro ao criar conta. E-mail em uso.' });
             }
             res.json({ mensagem: 'Conta criada com segurança!' });
         });
@@ -38,43 +43,189 @@ router.post('/cadastro', async (req, res) => {
     }
 });
 
-//Esse cara Puxa os jogos do banco de dados e retorna para o frontend
+// ==========================================
+// ROTA: LOGIN
+// O que faz: Verifica se o email e senha estão corretos e, se estiverem, guarda o ID do usuário na memória (Sessão).
+// ==========================================
+router.post('/login', (req, res) => {
+    const { email, password } = req.body;
+    const query = 'SELECT * FROM users WHERE email = ?';
+
+    db.query(query, [email], async (err, results) => {
+      if (err) {
+        console.error('Erro ao buscar utilizador:', err);
+        return res.status(500).json({ error: 'Erro interno no servidor' });
+      }
+      
+      if (results.length > 0) {
+        const isMatch = await bcrypt.compare(password, results[0].password_hash);
+        
+        if (isMatch) {
+          req.session.usuarioId = results[0].id;
+          res.json({ message: 'Login bem-sucedido' });
+        } else {
+          res.status(401).json({ message: 'Credenciais inválidas' });
+        }
+      } else {
+        res.status(401).json({ message: 'Credenciais inválidas' });
+      }
+    });
+});
+
+// ==========================================
+// ROTA: PERFIL (DASHBOARD)
+// O que faz: Lê a Sessão para saber quem está logado e devolve o Nome, Email e Bio para mostrar na tela do Dashboard.
+// ==========================================
+router.get('/perfil', (req, res) => {
+    if (!req.session.usuarioId) {
+        return res.status(401).json({ error: 'Não logado' });
+    }
+
+    const id = req.session.usuarioId;
+    const query = 'SELECT username, email, bio FROM users WHERE id = ?';
+    
+    db.query(query, [id], (err, results) => {
+        if (err || results.length === 0) {
+            console.error('Erro ao buscar perfil:', err);
+            return res.status(500).json({ error: 'Erro ao carregar perfil.' });
+        }
+        res.json(results[0]);
+    });
+});
+
+// ==========================================
+// ROTA: VITRINE PÚBLICA
+// O que faz: Puxa absolutamente todos os jogos cadastrados no banco de dados para mostrar na tela inicial (index.html).
+// ==========================================
 router.get('/jogos', (req, res) => {
     const query = 'SELECT * FROM games';
     db.query(query, (err, results) => {
       if (err) {
         console.error('Erro ao buscar jogos:', err);
-        res.status(500).json({ error: 'Erro ao buscar jogos' });
-        return;
+        return res.status(500).json({ error: 'Erro ao buscar jogos' });
       }
       res.json(results);
     });
-  });
-
-
-  //Pra upload
-  router.post('/upload',upload.single('arquivo'), (req, res) => {
-    if (!req.file) {
-      return res.status(400).json({ error: 'Nenhum arquivo enviado' });
-    }
-    res.json({ message: 'Arquivo enviado com sucesso', file: req.file });
-    console.log(req.file);
-  })
-module.exports = router;
-router.post('/login', (req, res) => {
-    const{email,senha} = req.body;
-    const query = 'SELECT * FROM users WHERE email = ? AND senha = ?';
-
-    db.query(query, [email,senha], (err, results) => {
-      if (err) {
-        console.error('Erro ao buscar jogos:', err);
-        res.status(500).json({ error: 'Erro ao buscar jogos' });
-        return;
-      }
-      if(results.length > 0){
-        res.json({message: 'Login bem-sucedido'});
-      } else {
-        res.status(401).json({message: 'Credenciais inválidas'});
-      }
+});
+// ==========================================
+// ROTA: DETALHES DE UM ÚNICO JOGO
+// O que faz: Busca no banco de dados apenas o jogo que tem o ID correspondente.
+// ==========================================
+router.get('/jogos/:id', (req, res) => {
+    const idDoJogo = req.params.id;
+    const query = 'SELECT * FROM games WHERE id = ?';
+    
+    db.query(query, [idDoJogo], (err, results) => {
+        if (err) {
+            console.error('Erro ao buscar detalhes do jogo:', err);
+            return res.status(500).json({ error: 'Erro ao buscar o jogo' });
+        }
+        
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'Jogo não encontrado' });
+        }
+        
+        // Devolve o primeiro (e único) jogo encontrado
+        res.json(results[0]);
     });
-  });
+});
+
+// ==========================================
+// ROTA: MEUS JOGOS (DASHBOARD)
+// O que faz: Puxa do banco de dados apenas os jogos que pertencem ao desenvolvedor que está logado no momento.
+// ==========================================
+router.get('/meus-jogos', (req, res) => {
+    if (!req.session.usuarioId) {
+        return res.status(401).json({ error: 'Acesso negado. Faça login.' });
+    }
+
+    const idDoDesenvolvedor = req.session.usuarioId;
+    const query = 'SELECT * FROM games WHERE developer_id = ?';
+    
+    db.query(query, [idDoDesenvolvedor], (err, results) => {
+        if (err) {
+            console.error('Erro ao buscar jogos do utilizador:', err);
+            return res.status(500).json({ error: 'Erro no servidor' });
+        }
+        res.json(results);
+    });
+});
+
+// ==========================================
+// ROTA: UPLOAD DE NOVO JOGO
+// O que faz: Recebe os textos e a imagem enviados pelo formulário e insere na tabela 'games' vinculado ao ID do desenvolvedor logado.
+// ==========================================
+router.post('/upload', upload.single('arquivo'), (req, res) => {
+    if (!req.session.usuarioId) {
+        return res.status(401).json({ error: 'Acesso negado. Faça login para publicar jogos.' });
+    }
+
+    const { titulo, preco, descricao, url_imagem } = req.body;
+    let caminhoImagem = '';
+
+    if (req.file) {
+        caminhoImagem = `/uploads/${req.file.filename}`;
+    } else if (url_imagem) {
+        caminhoImagem = url_imagem;
+    } else {
+        return res.status(400).json({ error: 'Você deve enviar um arquivo ou colar um link.' });
+    }
+
+    const idDoDesenvolvedor = req.session.usuarioId; 
+    const query = 'INSERT INTO games (title, preco, description, imagem, developer_id, url) VALUES (?, ?, ?, ?, ?, ?)';    
+    
+    db.query(query, [titulo, preco, descricao, caminhoImagem, idDoDesenvolvedor, '#'], (err, results) => {
+      if (err) {
+        console.error('Erro ao criar jogo no BD:', err);
+        return res.status(500).json({ error: 'Erro ao salvar os dados do jogo.' });
+      }
+      res.json({ message: 'Jogo publicado com sucesso!' });
+    });
+});
+
+// ==========================================
+// ROTA: APAGAR JOGO (DELETE)
+// O que faz: Apaga um jogo específico do banco de dados, mas apenas se o jogo pertencer ao desenvolvedor que clicou no botão.
+// ==========================================
+router.delete('/apagar-jogo/:id', (req, res) => {
+    if (!req.session.usuarioId) {
+        return res.status(401).json({ error: 'Acesso negado.' });
+    }
+
+    const idDoJogo = req.params.id;
+    const idDoDesenvolvedor = req.session.usuarioId;
+
+    const query = 'DELETE FROM games WHERE id = ? AND developer_id = ?';
+
+    db.query(query, [idDoJogo, idDoDesenvolvedor], (err, results) => {
+        if (err) {
+            console.error('Erro ao apagar jogo:', err);
+            return res.status(500).json({ error: 'Erro no servidor' });
+        }
+        res.json({ message: 'Jogo apagado com sucesso!' });
+    });
+});
+router.put('/editar-jogo/:id', (req, res) => {
+    if (!req.session.usuarioId) {
+        return res.status(401).json({ error: 'Acesso negado.' });
+    }
+
+    const idDoJogo = req.params.id;
+    const idDoDesenvolvedor = req.session.usuarioId;
+    const { titulo, preco, descricao } = req.body;
+
+    // Atualiza apenas se o jogo pertencer ao desenvolvedor logado
+    const query = 'UPDATE games SET title = ?, preco = ?, description = ? WHERE id = ? AND developer_id = ?';
+
+    db.query(query, [titulo, preco, descricao, idDoJogo, idDoDesenvolvedor], (err, results) => {
+        if (err) {
+            console.error('Erro ao editar jogo:', err);
+            return res.status(500).json({ error: 'Erro no servidor' });
+        }
+        res.json({ message: 'Jogo atualizado com sucesso!' });
+    });
+});
+// ==========================================
+// EXPORTAÇÃO (SEMPRE A ÚLTIMA LINHA!)
+// ==========================================
+module.exports = router;

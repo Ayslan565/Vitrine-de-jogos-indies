@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subir Jogo - IndieHub</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .form-container {
+            background-color: var(--surface-color);
+            padding: 2rem;
+            border-radius: 8px;
+            max-width: 500px;
+            margin: 2rem auto;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+        .form-container input, .form-container textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            background: #2d2d2d;
+            border: 1px solid #444;
+            color: white;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+        #mensagem { 
+            margin-top: 15px; 
+            font-weight: bold; 
+            text-align: center; 
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">IndieHub | Lançamento</div>
+        <nav><a href="/dashboard.html">⬅ Cancelar e Voltar ao Painel</a></nav>
+    </header>
+
+    <main class="container">
+        <h2 class="section-title" style="text-align: center;">Publicar Novo Jogo</h2>
+        
+        <div class="form-container">
+            <form id="form-upload">
+                <label for="titulo">Título do Jogo:</label>
+                <input type="text" id="titulo" required placeholder="Ex: Ponto Sem Volta">
+
+                <label for="preco">Preço (R$):</label>
+                <input type="number" id="preco" step="0.01" required placeholder="Ex: 19.90">
+
+                <label for="descricao">Descrição Curta:</label>
+                <textarea id="descricao" rows="3" required placeholder="Sobre o que é o jogo?"></textarea>
+
+                <hr style="border-color: #444; margin: 20px 0;">
+                <p style="text-align: center; margin-bottom: 15px;">Escolha APENAS UMA opção para a capa:</p>
+
+                <label for="arquivo">Opção 1: Subir Imagem do Computador</label>
+                <input type="file" id="arquivo" name="arquivo" accept="image/*">
+                
+                <label for="url_imagem">Opção 2: Usar Link da Internet (URL)</label>
+                <input type="url" id="url_imagem" placeholder="https://exemplo.com/imagem.png">
+                
+                <button type="submit" class="btn-upload" style="width: 100%; margin-top: 15px;">Publicar Jogo</button>
+            </form>
+            
+            <p id="mensagem"></p>
+        </div>
+    </main>
+
+    <script>
+        document.getElementById('form-upload').addEventListener('submit', async (e) => {
+            e.preventDefault(); 
+            
+            const mensagem = document.getElementById('mensagem');
+            mensagem.innerText = "A publicar jogo... Aguarde.";
+            mensagem.style.color = "yellow";
+
+            const formData = new FormData();
+            formData.append('titulo', document.getElementById('titulo').value);
+            formData.append('preco', document.getElementById('preco').value);
+            formData.append('descricao', document.getElementById('descricao').value);
+            formData.append('url_imagem', document.getElementById('url_imagem').value);
+            
+            const inputArquivo = document.getElementById('arquivo');
+            if (inputArquivo.files.length > 0) {
+                formData.append('arquivo', inputArquivo.files[0]);
+            }
+
+            try {
+                const resposta = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData 
+                });
+
+                const dados = await resposta.json();
+
+                if (resposta.ok) {
+                    // MUDANÇA AQUI: Mensagem e redirecionamento!
+                    mensagem.style.color = "#4ade80"; 
+                    mensagem.innerText = "Sucesso! A redirecionar para o seu painel...";
+                    
+                    // Aguarda 1.5 segundos e manda o usuário de volta para o dashboard
+                    setTimeout(() => {
+                        window.location.href = '/dashboard.html';
+                    }, 1500);
+
+                } else {
+                    mensagem.style.color = "#ff6b6b"; 
+                    mensagem.innerText = "Erro: " + dados.error;
+                }
+            } catch (erro) {
+                mensagem.style.color = "#ff6b6b";
+                mensagem.innerText = "Falha ao contactar o servidor.";
+            }
+        });
+    </script>
+</body>
+</html>

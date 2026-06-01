@@ -1,21 +1,29 @@
+const express = require('express');
+const session = require('express-session');
+const path = require('node:path');
+const apiRouter = require('./routes/api'); 
 
-const express = require('express')
-const path = require('node:path')
-const app = express()
-const port = 3000
-app.use(express.static(path.join(__dirname, 'public')))
+const app = express();
+const port = 3000;
 
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'))
-})
-
-const db = require('./db');
-const apiRouter = require('./routes/api');
-
-//Atualizar essa parte conforme vamos desenvolvendo as rotas da API
 app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.use(session({
+    secret: 'chave_secreta_indiehub_2026', 
+    resave: false,
+    saveUninitialized: false,
+    cookie: { 
+        maxAge: 1000 * 60 * 60 
+    }
+}));
+
 app.use('/api', apiRouter);
 
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
-})
+  console.log(` Servidor IndieHub a rodar perfeitamente na porta ${port}`);
+});
