@@ -89,20 +89,31 @@ async function carregarPerfil() {
             }
         });
 
-        async function apagarJogo(id) {
-            const confirmacao = confirm("Tem a certeza que deseja apagar este jogo?");
-            if (confirmacao) {
-                try {
-                    const resposta = await fetch(`/api/apagar-jogo/${id}`, { method: 'DELETE' });
-                    if (resposta.ok) {
-                        carregarMeusJogos(); 
-                    } else {
-                        alert("Erro ao tentar apagar o jogo.");
-                    }
-                } catch (erro) {
-                    console.error("Erro no delete:", erro);
+        function abrirModalApagar(id) {
+            document.getElementById('modal-apagar').style.display = 'flex';
+            document.getElementById('btn-confirmar-apagar').onclick = () => confirmarApagar(id);
+        }
+
+        function fecharModalApagar() {
+            document.getElementById('modal-apagar').style.display = 'none';
+        }
+
+        async function confirmarApagar(id) {
+            try {
+                const resposta = await fetch(`/api/apagar-jogo/${id}`, { method: 'DELETE' });
+                if (resposta.ok) {
+                    fecharModalApagar();
+                    carregarMeusJogos(); 
+                } else {
+                    alert("Erro ao tentar apagar o jogo.");
                 }
+            } catch (erro) {
+                console.error("Erro no delete:", erro);
             }
+        }
+
+        async function apagarJogo(id) {
+            abrirModalApagar(id);
         }
 
         carregarPerfil();
