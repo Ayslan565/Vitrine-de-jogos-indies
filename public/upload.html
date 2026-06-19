@@ -97,11 +97,9 @@
                 const dados = await resposta.json();
 
                 if (resposta.ok) {
-                    // MUDANÇA AQUI: Mensagem e redirecionamento!
                     mensagem.style.color = "#4ade80"; 
                     mensagem.innerText = "Sucesso! A redirecionar para o seu painel...";
                     
-                    // Aguarda 1.5 segundos e manda o usuário de volta para o dashboard
                     setTimeout(() => {
                         window.location.href = '/dashboard.html';
                     }, 1500);
