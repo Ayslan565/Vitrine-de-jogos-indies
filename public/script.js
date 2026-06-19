@@ -1,4 +1,3 @@
-// Carregar jogos ao abrir a página
 const carregarJogos = async () => {
     try {
         const resposta = await fetch('/api/jogos');
@@ -17,7 +16,6 @@ const carregarJogos = async () => {
             card.className = 'game-card';
             card.style.animationDelay = `${index * 0.05}s`;
             
-            // Determinar se é gratuito
             const precoFormatado = jogo.preco === 0 || jogo.preco === '0' ? 'Gratuito' : `R$ ${parseFloat(jogo.preco).toFixed(2)}`;
             const classePreco = jogo.preco === 0 || jogo.preco === '0' ? 'price free' : 'price paid';
             
