@@ -196,7 +196,5 @@ router.put('/editar-jogo/:id', (req, res) => {
         res.json({ message: 'Jogo atualizado com sucesso!' });
     });
 });
-// ==========================================
-// EXPORTAÇÃO (SEMPRE A ÚLTIMA LINHA!)
-// ==========================================
+
 module.exports = router;
