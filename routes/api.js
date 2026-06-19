@@ -107,7 +107,6 @@ router.get('/jogos/:id', (req, res) => {
             return res.status(404).json({ error: 'Jogo não encontrado' });
         }
         
-        // Devolve o primeiro (e único) jogo encontrado
         res.json(results[0]);
     });
 });
