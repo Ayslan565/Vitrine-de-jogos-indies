@@ -4,10 +4,7 @@ const db = require('../db');
 const multer = require('multer');
 const bcrypt = require('bcrypt');
 
-// ==========================================
-// CONFIGURAÇÃO DO MULTER
-// O que faz: Prepara o sistema para receber imagens e guardá-las na pasta public/uploads/
-// ==========================================
+
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
       cb(null, 'public/uploads/');
@@ -18,10 +15,7 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
-// ==========================================
-// ROTA: CADASTRO
-// O que faz: Recebe os dados do formulário, criptografa a senha e salva um novo desenvolvedor no banco de dados.
-// ==========================================
+
 router.post('/cadastro', async (req, res) => {
     const { username, email, password, bio } = req.body;
     const role = 'developer';
@@ -43,10 +37,7 @@ router.post('/cadastro', async (req, res) => {
     }
 });
 
-// ==========================================
-// ROTA: LOGIN
-// O que faz: Verifica se o email e senha estão corretos e, se estiverem, guarda o ID do usuário na memória (Sessão).
-// ==========================================
+
 router.post('/login', (req, res) => {
     const { email, password } = req.body;
     const query = 'SELECT * FROM users WHERE email = ?';
@@ -72,10 +63,7 @@ router.post('/login', (req, res) => {
     });
 });
 
-// ==========================================
-// ROTA: PERFIL (DASHBOARD)
-// O que faz: Lê a Sessão para saber quem está logado e devolve o Nome, Email e Bio para mostrar na tela do Dashboard.
-// ==========================================
+
 router.get('/perfil', (req, res) => {
     if (!req.session.usuarioId) {
         return res.status(401).json({ error: 'Não logado' });
@@ -93,10 +81,7 @@ router.get('/perfil', (req, res) => {
     });
 });
 
-// ==========================================
-// ROTA: VITRINE PÚBLICA
-// O que faz: Puxa absolutamente todos os jogos cadastrados no banco de dados para mostrar na tela inicial (index.html).
-// ==========================================
+
 router.get('/jogos', (req, res) => {
     const query = 'SELECT * FROM games';
     db.query(query, (err, results) => {
@@ -107,10 +92,7 @@ router.get('/jogos', (req, res) => {
       res.json(results);
     });
 });
-// ==========================================
-// ROTA: DETALHES DE UM ÚNICO JOGO
-// O que faz: Busca no banco de dados apenas o jogo que tem o ID correspondente.
-// ==========================================
+
 router.get('/jogos/:id', (req, res) => {
     const idDoJogo = req.params.id;
     const query = 'SELECT * FROM games WHERE id = ?';
@@ -130,10 +112,7 @@ router.get('/jogos/:id', (req, res) => {
     });
 });
 
-// ==========================================
-// ROTA: MEUS JOGOS (DASHBOARD)
-// O que faz: Puxa do banco de dados apenas os jogos que pertencem ao desenvolvedor que está logado no momento.
-// ==========================================
+
 router.get('/meus-jogos', (req, res) => {
     if (!req.session.usuarioId) {
         return res.status(401).json({ error: 'Acesso negado. Faça login.' });
@@ -151,10 +130,7 @@ router.get('/meus-jogos', (req, res) => {
     });
 });
 
-// ==========================================
-// ROTA: UPLOAD DE NOVO JOGO
-// O que faz: Recebe os textos e a imagem enviados pelo formulário e insere na tabela 'games' vinculado ao ID do desenvolvedor logado.
-// ==========================================
+
 router.post('/upload', upload.single('arquivo'), (req, res) => {
     if (!req.session.usuarioId) {
         return res.status(401).json({ error: 'Acesso negado. Faça login para publicar jogos.' });
@@ -183,10 +159,7 @@ router.post('/upload', upload.single('arquivo'), (req, res) => {
     });
 });
 
-// ==========================================
-// ROTA: APAGAR JOGO (DELETE)
-// O que faz: Apaga um jogo específico do banco de dados, mas apenas se o jogo pertencer ao desenvolvedor que clicou no botão.
-// ==========================================
+
 router.delete('/apagar-jogo/:id', (req, res) => {
     if (!req.session.usuarioId) {
         return res.status(401).json({ error: 'Acesso negado.' });
@@ -214,7 +187,6 @@ router.put('/editar-jogo/:id', (req, res) => {
     const idDoDesenvolvedor = req.session.usuarioId;
     const { titulo, preco, descricao } = req.body;
 
-    // Atualiza apenas se o jogo pertencer ao desenvolvedor logado
     const query = 'UPDATE games SET title = ?, preco = ?, description = ? WHERE id = ? AND developer_id = ?';
 
     db.query(query, [titulo, preco, descricao, idDoJogo, idDoDesenvolvedor], (err, results) => {
