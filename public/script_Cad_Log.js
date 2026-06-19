@@ -1,9 +1,5 @@
-// ==========================================
-// LOGIN
-// ==========================================
 const formLogin = document.getElementById('form-login');
 
-// O JavaScript só entra aqui dentro SE estiver na página de login
 if (formLogin) {
     formLogin.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -30,7 +26,6 @@ if (formLogin) {
                 setTimeout(() => window.location.href = '/dashboard.html', 1000);
             } else {
                 mensagem.style.color = "#ff6b6b"; 
-                // Alterado de dados.erro para dados.message de acordo com o seu api.js
                 mensagem.innerText = dados.message || "Erro ao fazer login";
             }
         } catch (erro) {
@@ -40,12 +35,9 @@ if (formLogin) {
     });
 }
 
-// ==========================================
-// CADASTRO
-// ==========================================
+
 const formCadastro = document.getElementById('form-cadastro');
 
-// O JavaScript só entra aqui dentro SE estiver na página de cadastro
 if (formCadastro) {
     formCadastro.addEventListener('submit', async (e) => {
         e.preventDefault();
